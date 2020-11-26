@@ -1,10 +1,10 @@
 import React from "react";
 import Link from "next/link";
+import { useRouter } from 'next/router'
 import Layout from "../../components/Layout";
 import sanity from "../../lib/sanity";
 import listStyles from "../../styles/list";
 import imageUrlFor from "../../utils/imageUrlFor";
-
 const personsQuery = `*[_type == "person"] { _id }`;
 
 const singlePersonQuery = `*[_type == "person" && _id == $id] {
@@ -21,6 +21,11 @@ const singlePersonQuery = `*[_type == "person" && _id == $id] {
 `;
 
 const Person = ({ person }) => {
+  const router = useRouter()
+
+  if (router.isFallback) {
+    return <div>Loading...</div>
+  }
   return (
     <Layout>
       <div className="person">
@@ -116,7 +121,7 @@ export const getStaticPaths = async () => {
 // This function gets called at build time on server-side.
 export const getStaticProps = async ({ params }) => {
   const person = await sanity.fetch(singlePersonQuery, { id: params.id });
-  return { props: { person }, revalide: 10 };
+  return { props: { person }, revalidate: 10 };
 };
 
 export default Person;
